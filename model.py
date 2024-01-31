@@ -1,11 +1,44 @@
 import statsmodels as sm
 
 
-class TVRegression(sm.tsa.statespace.MLEModel):
-    def __init__(self, y_t, x_t, w_t):
+class DfmMS(sm.tsa.statespace.MLEModel):
+    r'''
+    Dynamic factor model with Markov switching and error correction
+
+    Paramenters
+    -----------
+    endog : array_like
+        The observed time-serier process : math:'y'
+    k_factors : int
+        the number of unobserved factors-
+    factor_order : into
+        The order of the vector autoregression followed by the factors.
+        error_cov_type : {'scalar', 'diaglonal', 'unstructured'}, optional 
+        The structure of the covariance matrix of the overvation errror term, 
+        where "unstuctured" puts no restrictions on the matrix, "diagonal" 
+        requires it to be any diagonal matrix (uncorrealted errors), and 
+        "scalar" requires it to be a scalar times the identity matrix. Default 
+        is "diagonal". 
+    error_order : int, optional
+        The order of thte vector autogregression followed by the observation 
+        error component. Defsault is None, corresponding to white noise errors.
+    error_var : bool, optional
+        Whether or not to model ther errors jointly via a vector autoregression, 
+        rather than as individial autoregressions. Has no effect unless 
+        'errors_order' is set. Default is False
+
+
+    Drop enforce stationarity....
+    **kwargs
+        Keytword arguemtns may be used to provide default values for state space 
+        matrices or for Kalman filtering optionsl See 'Representation', and 
+        'KalmanFilter' for more details.
+    '''
+
+    def __init__(self, endog, k_factors, factor_order):
         exog = np.c_[x_t, w_t]  # shaped nobs x 2
 
-        super(TVRegression, self).__init__(
+        super(DfmMS, self).__init__(
             endog=y_t, exog=exog, k_states=2, initialization="diffuse"
         )
 
