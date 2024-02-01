@@ -1,0 +1,1 @@
+I am attempting to expand on the DynamicFactor model in Statsmodels to include Markov-switching regimes. This effort is part of my masters thesis on updating the work of Chauvet (1998) url: https://www.jstor.org/stable/2527348?origin=crossref
