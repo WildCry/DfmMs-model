@@ -26,6 +26,20 @@ class DfmMS(sm.tsa.statespace.MLEModel):
         Whether or not to model ther errors jointly via a vector autoregression, 
         rather than as individial autoregressions. Has no effect unless 
         'errors_order' is set. Default is False
+    n_states : int
+        The number of hidden states.
+    switching_variance : bool, optional
+        Whether or not there is regime-specific heteroskedasticity, i.e.
+        whether or not the error term has a switching variance. Default is
+        False.
+
+    Notes
+    -----
+
+    The model can be written as:
+
+    .. math::
+        y_it = \lambda*F_tj
 
 
     Drop enforce stationarity....
@@ -35,7 +49,7 @@ class DfmMS(sm.tsa.statespace.MLEModel):
         'KalmanFilter' for more details.
     '''
 
-    def __init__(self, endog, k_factors, factor_order):
+    def __init__(self, endog, k_factors, factor_order, error_order, error_var, n_states):
         exog = np.c_[x_t, w_t]  # shaped nobs x 2
 
         super(DfmMS, self).__init__(
