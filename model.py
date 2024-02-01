@@ -1,4 +1,6 @@
+import numpy as np
 import statsmodels as sm
+from statsmodels.tools.data import _is_using_pandas
 
 
 class DfmMS(sm.tsa.statespace.MLEModel):
@@ -49,12 +51,71 @@ class DfmMS(sm.tsa.statespace.MLEModel):
         'KalmanFilter' for more details.
     '''
 
-    def __init__(self, endog, k_factors, factor_order, error_order, error_var, n_states):
-        exog = np.c_[x_t, w_t]  # shaped nobs x 2
+    def __init__(self, endog, k_factors, factor_order, error_order=0,
+                 error_var=False, error_cov_type='diagonal', n_regimes=2,  **kwargs):
 
+        # Factor-related properties
+        self.k_factors = k_factors
+        self.factor_order = factor_order
+
+        # Error-related properties
+        self.error_order = error_order
+        self.error_var = error_var and error_order > 0
+        self.error_cov_type = error_cov_type
+
+        # Switching-related properties
+        self.n_regimes = n_regimes  # Note! Not implemented yet
+
+        # We need to have an array or pandas at this point
+        if not _is_using_pandas(endog, None):
+            endog = np.asanyarray(endog, order='C')
+
+        # Save some useful model orders, internally used
+        k_endog = endog.shape[1] if endog.ndim > 1 else 1
+        self._factor_order = max(1, self.factor_order) * self.k_factors
+        self._error_order = self.error_order * k_endog
+
+        # Calculate the number of states
+        k_states = self._factor_order
+        k_posdef = self.k_factors
+        if self.error_order > 0:
+            k_states += self._error_order
+            k_posdef += k_endog
+
+        # Test for non-multivariate endog
+        if k_endog < 2:
+            raise ValueError('The dynamic factors model is only valid for'
+                             ' multivariate time series.')
+
+        # Test for too many factors
+        if self.k_factors >= k_endog:
+            raise ValueError('Number of factors must be less than the number'
+                             ' of endogenous variables.')
+
+        # Test for invalid error_cov_type
+        if self.error_cov_type not in ['scalar', 'diagonal', 'unstructured']:
+            raise ValueError('Invalid error covariance matrix type'
+                             ' specification.')
+
+        # By default, initialize as stationary
+        kwargs.setdefault('initialization', 'stationary')
+
+        # Initialize the state space model
         super(DfmMS, self).__init__(
-            endog=y_t, exog=exog, k_states=2, initialization="diffuse"
+            endog, exog=exog, k_states=k_states, k_posdef=k_posdef, **kwargs
         )
+
+        # Dunno if this is necessary...
+        self.ssm._time_invariant = True
+
+        # Initialize the components
+        self.parameters = {}
+        self._initialize_loadings()
+        self._initialize_exog()
+        self._initialize_error_cov()
+        self._initialize_factor_transition()
+        self._initialize_error_transition()
+        self.k_params = sum(self.parameters.values())
 
         # Since the design matrix is time-varying, it must be
         # shaped k_endog x k_states x nobs
