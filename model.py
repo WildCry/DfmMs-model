@@ -5,7 +5,7 @@ from statsmodels.tools.data import _is_using_pandas
 
 class DfmMS(sm.tsa.statespace.MLEModel):
     r'''
-    Dynamic factor model with Markov switching and error correction
+    Dynamic factor model with Markov switching
 
     Paramenters
     -----------
