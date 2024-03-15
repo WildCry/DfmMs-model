@@ -57,3 +57,9 @@ class SwitchingDynamicFactor:
         self.error_order = error_order
         self.endog = endog
         self.n_endog = endog.shape[1]
+        
+        
+        
+        
+    def fit():
+        
