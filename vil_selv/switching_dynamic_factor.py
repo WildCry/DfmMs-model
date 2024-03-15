@@ -1,6 +1,14 @@
 import numpy as np
 
 
+class Results():
+    def __init__(self, estimated_parameters=dict) -> None:
+        self.estimated_parameters = estimated_parameters
+
+    def summary(self):
+        pass
+
+
 class SwitchingDynamicFactor:
     r'''
     Dynamic factor model with Markov switching
@@ -10,7 +18,7 @@ class SwitchingDynamicFactor:
     endog : array_like
         The observed time-series process :math:`y`
     k_factors : int
-        the number of unobserved factors
+        The number of unobserved factors
     factor_order : int
         The order of the vector autoregression followed by the factors.
     error_cov_type : {'scalar', 'diagonal', 'unstructured'}, optional 
@@ -57,9 +65,15 @@ class SwitchingDynamicFactor:
         self.error_order = error_order
         self.endog = endog
         self.n_endog = endog.shape[1]
-        
-        
-        
-        
-    def fit():
-        
+
+    def fit(self) -> Results:
+        '''
+        Fits the model using the KalmanFilter, HamiltonFilter, and KimApproximations and 
+        maximizes likelihood function using the BFGS algorithim. 
+
+        Returns a  Results object with the estimated parameters.
+        '''
+
+        estimated_parameters = None  # Not implemeted yet
+        result = Results(estimated_parameters)
+        return result
