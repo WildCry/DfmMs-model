@@ -21,6 +21,7 @@ class FetchFred:
             mod_time = os.path.getmtime(cache_path)
             current_time = datetime.datetime.now().timestamp()
             return (current_time - mod_time) / 3600 / 24 <= max_age_days
+
         return False
 
     def list_cached_series(self):
@@ -29,6 +30,7 @@ class FetchFred:
         """
         cached_files = os.listdir(self.cache_dir)
         series_ids = [os.path.splitext(file)[0] for file in cached_files]
+
         return series_ids
 
     def check_series_cache_status(self, series_ids, max_age_days=1):
@@ -48,6 +50,7 @@ class FetchFred:
                     status[series_id] = 'Expired'
             else:
                 status[series_id] = 'Not Cached'
+
         return status
 
     def fetch(self, series=None, max_age_days=1) -> pd.DataFrame:
@@ -70,4 +73,5 @@ class FetchFred:
                     print(f"Failed to fetch data for {series_name}: {e}")
                     continue
             lst.append(series_data.rename(series_name))
+
         return pd.concat(lst, axis=1)

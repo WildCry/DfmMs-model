@@ -14,8 +14,10 @@ fredr_set_key("d59606a150e09c54fd5158bac863da0d")  # Use your actual FRED API ke
 fetch_series_data <- function(series_id) {
   fredr_series_observations(series_id = series_id) %>%
     mutate(series_id = series_id) %>%
+    filter(date < as.Date("2005-01-01")) %>%
     select(date, value, series_id)
 }
+
 
 # List of series IDs
 series_ids <- c("IPMAN", "W875RX1", "CMRMTSPL", "PAYEMS")
@@ -75,7 +77,7 @@ yt = t(data.logds[, c(series_ids), with = F])
 msdcf_ssm = function(par, yt, n_states = NULL){
   #Get the number of states
   n_states = length(unique(unlist(lapply(strsplit(names(par)[grepl("p_", names(par))], "p_"), function(x){substr(x[2], 1, 1)}))))
-  
+
   #Get the parameters
   vars = dimnames(yt)[which(unlist(lapply(dimnames(yt), function(x){!is.null(x)})))][[1]]
   phi = par[grepl("phi", names(par))]
@@ -229,7 +231,7 @@ solve = maxLik(logLik = objective, start = init, method = "BFGS",
 ssm = msdcf_ssm(solve$estimate, yt)
 
 #Get the column means and standard deviations
-M = matrix(unlist(data.logd[, lapply(.SD, mean, na.rm = TRUE), .SDcols = c(vars)]), 
+M = matrix(unlist(data.logd[, lapply(.SD, mean, na.rm = TRUE), .SDcols = c(series_ids)]), 
            ncol = 1, dimnames = list(vars, NULL))
 
 #Get the steady state coefficient matrices
@@ -252,7 +254,7 @@ gamma = Hm[, grepl("ct", colnames(Hm))]
 D = M - gamma %*% matrix(rep(d, ncol(gamma)))
 
 #Initialize first element of the dynamic common factor
-Y1 = t(data.log[, c(vars), with = F][1, ])
+Y1 = t(data.log[, c(series_ids), with = F][1, ])
 initC = function(par){
   return(sum((Y1 - D - gamma %*% par)^2))
 }
