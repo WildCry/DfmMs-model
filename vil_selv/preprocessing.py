@@ -17,10 +17,10 @@ def preprocess_data(df: pd.DataFrame, dropna: bool = True, contain_zeros: bool =
 
     # Adding a small constant to avoid log(0), adjust as needed based on your data
     if contain_zeros:
-        df = df.replace(0, 1e-9)
+        df = df.mask(df == 0, 1e-9)
 
     # Apply log transformation directly without replacing zeros (assumes no zero values)
-    df = df.apply(lambda x: np.log(x))
+    df = np.log(df)
 
     # Compute the difference more efficiently
     df = df.diff()

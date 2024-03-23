@@ -55,8 +55,8 @@ class FetchFred:
 
     def fetch(self, series=None, max_age_days=1) -> pd.DataFrame:
         if series is None:
-            series = {'MTS': 'CMRMTSPL', 'PILTP': 'W875RX1',
-                      'ENAP': 'PAYEMS', 'IPMAN': 'IPMAN'}
+            series = {'CMRMTSPL': 'CMRMTSPL', 'W875RX1': 'W875RX1',
+                      'PAYEMS': 'PAYEMS', 'IPMAN': 'IPMAN'}
 
         lst = []
         for series_name, series_id in series.items():
